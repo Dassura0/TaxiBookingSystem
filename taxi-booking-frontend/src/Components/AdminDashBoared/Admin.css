@@ -1,0 +1,96 @@
+.AdminApp {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 70%;
+    margin: 10px auto auto auto;
+    border: 1px solid #bdb8b8;
+    border-radius: 12px;
+  }
+  
+  .admin-header{
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .navigation {
+    padding-top: 10px;
+    padding-right: 8px;
+  }
+  
+  .navigation ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .navigation li {
+    display: inline;
+  }
+
+  
+  button {
+    margin-left: 10px;
+  }
+
+  .management {
+    margin-bottom: 40px;
+  }
+  
+  form {
+    margin-bottom: 20px;
+  }
+  
+  form div {
+    margin-bottom: 10px;
+  }
+  
+  input {
+    margin-left: 10px;
+  }
+
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  table th {
+    background-color: #f2f2f2;
+    text-align: left;
+  }
+
+  button {
+    margin-top: 10px;
+    margin-right: 5px;
+    cursor: pointer;
+  }
+  
+  button.edit {
+    background-color: #4CAF50; /* Green */
+    color: white;
+  }
+  
+  button.delete {
+    background-color: #f44336; /* Red */
+    color: white;
+  }
+  
+  
+  .car-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .management h2 {
+padding-top: 10px;
+  }
+
+  .add-btn {
+    margin-bottom: 20px;
+  }

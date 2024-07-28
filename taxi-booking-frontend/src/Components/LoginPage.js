@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import "./login.css";
 
-class Signup extends Component {
+class signin extends Component {
   state = {
     res: {},
     res_received: false,
@@ -46,7 +46,7 @@ class Signup extends Component {
     return (
       <div className="container">
         <div className="paper">
-          <form onSubmit={this.handleSubmit} className="signup-form">
+          <form onSubmit={this.handleSubmit} className="signin-form">
             <div className="text">Taxi Booking</div>
             <input
               type="text"
@@ -72,4 +72,4 @@ class Signup extends Component {
   }
 }
 
-export default Signup;
+export default signin;

@@ -1,144 +1,146 @@
 import React, { Component } from "react";
 import axios from "axios";
-import "antd/dist/antd.css";
-import "./UserSignIn.css";
-import Paper from 'material-ui/Paper';
-import Avatar from 'material-ui/Avatar';
-import SignInImage from './Images/download.jpg';
-import { Form, Input, Button } from "antd";
-import { locales } from "moment";
-
-const stylePaper = {
-    height: '440px',
-    width: '400px',
-    background: '#f8f8f9',
-    position: 'relative',
-    marginLeft:'35%',
-    marginTop: '70px'
-};
-
-const styleText = {
-    marginLeft: '100px',
-    marginTop: '-50px',
-    fontSize: '1.71429rem',
-    fontFamily: 'ff-clan-web-pro,"Helvetica Neue",Helvetica,sans-serif!important',
-    fontWeight: '400'
-};
-
-const FormItem = Form.Item;
+import './UserSignIn.css'; // Import your own CSS for styling
+import SignInImage from './Images/download.jpg'; // Import your image
 
 class Signup extends Component {
   state = {
     res: {},
-    res_received: false
+    res_received: false,
+    formData: {
+      firstname: '',
+      lastname: '',
+      email: '',
+      password: '',
+    },
+    errors: {}
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, fieldsValue) => {
-      if (!err) {
-        const values = {
-          ...fieldsValue,
-          role: 'user'        
-        };
-        //delete values[""];
-        console.log("Received values of form: ", values);
-        axios
-          .post("https://api.crossfire37.hasura-app.io/signup", {
-            "user" : {
-              "provider" : "username",
-              "data": {
-                "username": values.firstname,
-                "password": values.password
-              }
-            },
-            "role": values.role,
-            "firstname": values.firstname,
-            "lastname":  values.lastname
-            }
-          )
-          .then(response => {
-            console.log(response);
-            localStorage.setItem('AuthToken' ,response.data.auth_token)
-            this.setState({ res: response.data });
-            this.setState({ res_received: true });
-          })
-          .catch(error => {
-            alert("ERROR: User name already exists!");
-            console.log(error);
-          });
+  handleChange = (e) => {
+    const { name, value } = e.target;
+    this.setState(prevState => ({
+      formData: {
+        ...prevState.formData,
+        [name]: value
       }
-    });
+    }));
+  };
+
+  validateFields = () => {
+    const { formData } = this.state;
+    const errors = {};
+    if (!formData.firstname) errors.firstname = "Please input your First Name!";
+    if (!formData.lastname) errors.lastname = "Please input your Last Name!";
+    if (!formData.email) errors.email = "Please input your E-mail!";
+    if (!formData.password) errors.password = "Please input your Password!";
+    if (formData.password.length < 8) errors.password = "Minimum password length is 8 characters";
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailPattern.test(formData.email)) errors.email = "The input is not valid E-mail!";
+    this.setState({ errors });
+    return Object.keys(errors).length === 0;
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    if (this.validateFields()) {
+      const values = {
+        ...this.state.formData,
+        role: 'user'
+      };
+      console.log("Received values of form: ", values);
+      axios
+        .post("https://api.crossfire37.hasura-app.io/signup", {
+          "user": {
+            "provider": "username",
+            "data": {
+              "username": values.firstname,
+              "password": values.password
+            }
+          },
+          "role": values.role,
+          "firstname": values.firstname,
+          "lastname": values.lastname
+        })
+        .then(response => {
+          console.log(response);
+          localStorage.setItem('AuthToken', response.data.auth_token)
+          this.setState({ res: response.data, res_received: true });
+        })
+        .catch(error => {
+          alert("ERROR: User name already exists!");
+          console.log(error);
+        });
+    }
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-    let result = null;
-    if (this.state.res_received) {
-      alert('Sign Up Succesful! Please go to "Ride" to book your ride.');
-      console.log(this.state.res_recieved);
-    }
+    const { formData, errors } = this.state;
 
     return (
-      <Paper style={stylePaper}>
-        
-        <Form onSubmit={this.handleSubmit} className="signup-form">
-          <div style={{marginLeft:'0px', marginBottom: '40px'}}>
-              <Avatar src={SignInImage} size='80px' />  
-              <div style={styleText}>
-                Taxi  Booking
-              </div>
+      <div className="signup-container">
+        <div className="signup-header">
+          <img src={SignInImage} alt="Sign In" className="signup-avatar" />
+          <h2>Taxi Booking</h2>
+        </div>
+        <form onSubmit={this.handleSubmit} className="signup-form">
+          <div className="form-item">
+            <input
+              type="text"
+              name="firstname"
+              placeholder="First Name"
+              value={formData.firstname}
+              onChange={this.handleChange}
+              className={errors.firstname ? 'error' : ''}
+              required
+            />
+            {errors.firstname && <div className="error-message">{errors.firstname}</div>}
           </div>
-          <FormItem>
-            {getFieldDecorator("firstname", {
-              rules: [{ required: true, message: "Please input your First Name!" }]
-            })(<Input placeholder="First Name" />)}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("lastname", {
-              rules: [{ required: true, message: "Please input your Last Name!" }]
-            })(<Input placeholder="Last Name" />)}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("email", {
-              rules: [
-                {
-                  type: "email",
-                  message: "The input is not valid E-mail!"
-                },
-                {
-                  required: true,
-                  message: "Please input your E-mail!"
-                }
-              ]
-            })(<Input placeholder="Email" />)}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("password", {
-              rules: [
-                { required: true, message: "Please input your Password!" },
-                { min: 8, message: "Minimum password length is 8 characters" }
-              ]
-            })(<Input type="password" placeholder="Password" />)}
-          </FormItem>
-        
-          <FormItem>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="signup-form-button"
-            >
-              SIGN UP
-            </Button>
+          <div className="form-item">
+            <input
+              type="text"
+              name="lastname"
+              placeholder="Last Name"
+              value={formData.lastname}
+              onChange={this.handleChange}
+              className={errors.lastname ? 'error' : ''}
+              required
+            />
+            {errors.lastname && <div className="error-message">{errors.lastname}</div>}
+          </div>
+          <div className="form-item">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={this.handleChange}
+              className={errors.email ? 'error' : ''}
+              required
+            />
+            {errors.email && <div className="error-message">{errors.email}</div>}
+          </div>
+          <div className="form-item">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={this.handleChange}
+              className={errors.password ? 'error' : ''}
+              required
+            />
+            {errors.password && <div className="error-message">{errors.password}</div>}
+          </div>
+          <button type="submit" className="signup-form-button">
+            SIGN UP
+          </button>
+          <div className="signup-footer">
             Or <a href="/Login">Login</a>
-          </FormItem>
-          {result}
-        </Form>
-      </Paper>
+          </div>
+        </form>
+      </div>
     );
   }
 }
 
-const Sign_up = Form.create()(Signup);
-
-export default Sign_up;
+export default Signup;
